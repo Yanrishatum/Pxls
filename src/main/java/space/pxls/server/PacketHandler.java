@@ -7,11 +7,13 @@ import com.mashape.unirest.http.async.Callback;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import io.undertow.websockets.core.WebSocketChannel;
 import space.pxls.App;
+import space.pxls.user.Role;
 import space.pxls.user.User;
 import space.pxls.util.Timer;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.spec.EllipticCurve;
 import java.util.Collections;
 
 public class PacketHandler {
@@ -40,6 +42,7 @@ public class PacketHandler {
         if (user != null) {
             if (obj instanceof Packet.ClientPlace) handlePlace(channel, user, ((Packet.ClientPlace) obj));
             if (obj instanceof Packet.ClientCaptcha) handleCaptcha(channel, user, ((Packet.ClientCaptcha) obj));
+            if (obj instanceof Packet.ClientAdminCommand && user.getRole().greaterEqual(Role.ADMIN)) handleCommand(channel, user, (Packet.ClientAdminCommand) obj);
         }
     }
 
@@ -97,6 +100,49 @@ public class PacketHandler {
                 });
     }
 
+    private void handleCommand(WebSocketChannel channel, User user, Packet.ClientAdminCommand cmd) {
+        switch (cmd.command)
+        {
+            case "alert":
+                if (cmd.arguments.length == 0) return; // Empty message.
+                
+                StringBuffer buf = new StringBuffer();
+                buf.append(cmd.arguments[0]);
+                int i = 1;
+                while (i < cmd.arguments.length)
+                {
+                    buf.append(" ");
+                    buf.append(cmd.arguments[i++]);
+                }
+                server.broadcast(new Packet.ServerAlert(buf.toString()));
+                break;
+            case "blank":
+                if (cmd.arguments.length >= 5)
+                {
+                    int from = cmd.arguments.length >= 6 ? Integer.parseInt(cmd.arguments[5]) : -1;
+                    App.blank(user, Integer.parseInt(cmd.arguments[0]), Integer.parseInt(cmd.arguments[1]), Integer.parseInt(cmd.arguments[2]),
+                                                                        Integer.parseInt(cmd.arguments[3]), Integer.parseInt(cmd.arguments[4]), from);
+                }
+                else
+                {
+                    server.send(channel, new Packet.ServerAlert("Invalid amount of argument for `blank` command!"));
+                }
+                break;
+            case "reload":
+                if (!App.reloadConfig())
+                {
+                    server.send(channel, new Packet.ServerAlert("Error occured during config reloading!"));
+                }
+                break;
+            case "save":
+                App.saveMap();
+                break;
+            // TODO: Edit palette.
+            default:
+                server.send(channel, new Packet.ServerAlert("Unknown command!"));
+        }
+    }
+    
     private void updateUserData() {
         userData.run(() -> {
             server.broadcast(new Packet.ServerUsers(server.getConnections().size()));

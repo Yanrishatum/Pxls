@@ -24,6 +24,23 @@ public class Database implements Closeable {
         handle.createUsersTable();
     }
 
+    public void blank(User who, int x1, int y1, int x2, int y2, int color) {
+        int id = who.getId();
+        int x;
+        byte bcolor = (byte) color;
+        while (y1 <= y2)
+        {
+            x = x1;
+            while (x <= x2)
+            {
+                handle.putPixel(x, y1, bcolor, id);
+                x++;
+            }
+            y1++;
+        }
+        handle.updateUserTime(id);
+    }
+
     public void placePixel(int x, int y, int color, User who) {
         handle.putPixel(x, y, (byte) color, who.getId());
         handle.updateUserTime(who.getId());

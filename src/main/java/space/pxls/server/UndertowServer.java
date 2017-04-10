@@ -86,6 +86,7 @@ public class UndertowServer {
                 Object obj = null;
                 if (type.equals("placepixel")) obj = App.getGson().fromJson(jsonObj, Packet.ClientPlace.class);
                 if (type.equals("captcha")) obj = App.getGson().fromJson(jsonObj, Packet.ClientCaptcha.class);
+                if (type.equals("command")) obj = App.getGson().fromJson(jsonObj, Packet.ClientAdminCommand.class);
 
                 if (obj != null) {
                     socketHandler.accept(channel, user, obj);

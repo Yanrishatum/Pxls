@@ -13,6 +13,11 @@ public class Packet {
     public static class ClientCaptcha {
         public String token;
     }
+    
+    public static class ClientAdminCommand {
+        public String command;
+        public String[] arguments;
+    }
 
     public static class ClientAdminCooldownOverride {
         public boolean override;
@@ -53,6 +58,15 @@ public class Packet {
                 this.y = y;
                 this.color = color;
             }
+        }
+    }
+    
+    public static class ServerAlert {
+        public String type = "alert";
+        public String message;
+        
+        public ServerAlert(String message) {
+            this.message = message;
         }
     }
 

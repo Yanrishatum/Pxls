@@ -2,6 +2,7 @@ package space.pxls;
 
 import com.google.gson.Gson;
 import com.typesafe.config.Config;
+import com.typesafe.config.ConfigException;
 import com.typesafe.config.ConfigFactory;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -78,6 +79,21 @@ public class App {
         mapSaveTimer = new Timer(config.getDuration("board.saveInterval", TimeUnit.SECONDS));
         mapBackupTimer = new Timer(config.getDuration("board.backupInterval", TimeUnit.SECONDS));
     }
+    
+    public static Boolean reloadConfig()
+    {
+        try
+        {
+            Config newCfg = ConfigFactory.parseFile(new File("pxls.conf")).withFallback(ConfigFactory.load());
+            newCfg.checkValid(ConfigFactory.load());
+            config = newCfg;
+        }
+        catch (ConfigException e)
+        {
+            return false;
+        }
+        return true;
+    }
 
 
     public static Gson getGson() {
@@ -112,6 +128,54 @@ public class App {
         return config.hasPath("captcha.key") && config.hasPath("captcha.secret");
     }
 
+    public static void blank(User user, int x1, int y1, int x2, int y2, int to, int from)
+    {
+        // Would use optimization
+        
+        if (to < 0 || to >= getPalette().size() || from >= getPalette().size()) return;
+        if (from < 0) from = -1; // Clamp to -1
+        // Clamp
+        if (x1 < 0) x1 = 0;
+        else if (x1 >= width) x1 = width - 1;
+        if (y1 < 0) y1 = 0;
+        else if (y1 >= height) y1 = height - 1;
+        
+        if (x2 < 0) x2 = 0;
+        else if (x2 >= width) x2 = width - 1;
+        if (y2 < 0) y2 = 0;
+        else if (y2 >= height) y2 = height - 1;
+        
+        // Swap
+        if (x2 > x1)
+        {
+            int tmp = x2;
+            x2 = x1;
+            x1 = tmp;
+        }
+        if (y2 > y1)
+        {
+            int tmp = y2;
+            y2 = y1;
+            y1 = tmp;
+        }
+        
+        int pos;
+        int x;
+        int y = y1;
+        while (y <= y2)
+        {
+            pos = y * width + x1;
+            x = x1;
+            while (x <= x2)
+            {
+                if (from == -1 || board[pos + x] == (byte) from) board[pos + x] = (byte) to;
+                x++;
+            }
+            y1++;
+        }
+        pixelLogger.log(Level.INFO, user.getName() + " Blank operation: " + x1 + " " + y1 + " > " + x2 + " " + y2 + " : " + (from == -1 ? to : from + " => " + to));
+        database.blank(user, x1, y1, x2, y2, to);
+    }
     public static void putPixel(int x, int y, int color, User user) {
         if (x < 0 || x >= width || y < 0 || y >= height || color < 0 || color >= getPalette().size()) return;
         board[x + y * width] = (byte) color;

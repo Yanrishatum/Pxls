@@ -20,6 +20,7 @@ public class User {
         this.name = name;
         this.login = login;
         this.lastPlaceTime = lastPlaceTime;
+        this.role = role;
     }
 
     public int getId() {

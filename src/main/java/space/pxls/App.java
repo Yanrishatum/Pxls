@@ -28,7 +28,7 @@ public class App {
     private static Config config;
     private static Database database;
     private static UserManager userManager;
-    private static Logger pixelLogger;
+    public static Logger pixelLogger;
 
     private static int width;
     private static int height;
@@ -87,6 +87,7 @@ public class App {
             Config newCfg = ConfigFactory.parseFile(new File("pxls.conf")).withFallback(ConfigFactory.load());
             newCfg.checkValid(ConfigFactory.load());
             config = newCfg;
+            pixelLogger.log(Level.INFO, "Reloaded config file");
         }
         catch (ConfigException e)
         {

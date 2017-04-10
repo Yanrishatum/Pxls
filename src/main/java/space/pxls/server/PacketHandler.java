@@ -11,6 +11,8 @@ import space.pxls.user.Role;
 import space.pxls.user.User;
 import space.pxls.util.Timer;
 
+import org.apache.logging.log4j.Level;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.spec.EllipticCurve;
@@ -42,7 +44,11 @@ public class PacketHandler {
         if (user != null) {
             if (obj instanceof Packet.ClientPlace) handlePlace(channel, user, ((Packet.ClientPlace) obj));
             if (obj instanceof Packet.ClientCaptcha) handleCaptcha(channel, user, ((Packet.ClientCaptcha) obj));
-            if (obj instanceof Packet.ClientAdminCommand && user.getRole().greaterEqual(Role.ADMIN)) handleCommand(channel, user, (Packet.ClientAdminCommand) obj);
+            if (obj instanceof Packet.ClientAdminCommand)
+            {
+                if (user.getRole().greaterEqual(Role.ADMIN)) handleCommand(channel, user, (Packet.ClientAdminCommand) obj);
+                else server.send(channel, new Packet.ServerAlert("Insufficent rights!"));
+            }
         }
     }
 
@@ -136,6 +142,7 @@ public class PacketHandler {
                 break;
             case "save":
                 App.saveMap();
+                App.pixelLogger.log(Level.INFO, user.getName() + " invoked map save.");
                 break;
             // TODO: Edit palette.
             default:

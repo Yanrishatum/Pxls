@@ -31,11 +31,14 @@ public interface DAO extends Closeable {
             "login VARCHAR(64) NOT NULL," +
             "signup_time TIMESTAMP NOT NULL DEFAULT now(6)," +
             "last_pixel_time TIMESTAMP," +
-            "role NOT NULL DEFAULT 0)")
+            "role VARCHAR(16) NOT NULL DEFAULT 0)")
     void createUsersTable();
 
     @SqlUpdate("UPDATE users SET last_pixel_time = now(6) WHERE id = :id")
     void updateUserTime(@Bind("id") int userId);
+    
+    @SqlUpdate("UPDATE users SET role = :role WHERE id = :id")
+    void updateUserRole(@Bind("id") int userId, @Bind("role") int role);
 
     @SqlUpdate("CREATE TABLE IF NOT EXISTS ips (id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT, user INT REFERENCES users(user)), ip TEXT, last_activity NUMERIC DEFAULT now(6)")
     void createIpsTable();

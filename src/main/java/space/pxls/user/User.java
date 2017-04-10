@@ -15,7 +15,7 @@ public class User {
     private boolean justShowedCaptcha;
     private long lastPlaceTime;
 
-    public User(int id, String name, String login, long lastPlaceTime) {
+    public User(int id, String name, String login, long lastPlaceTime, Role role) {
         this.id = id;
         this.name = name;
         this.login = login;

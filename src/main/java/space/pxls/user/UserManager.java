@@ -38,7 +38,7 @@ public class UserManager {
 
     private User getByDB(DBUser user) {
         if (user == null) return null;
-        return userCache.computeIfAbsent(user.id, (k) -> new User(user.id, user.username, user.login, user.lastPlaceTime));
+        return userCache.computeIfAbsent(user.id, (k) -> new User(user.id, user.username, user.login, user.lastPlaceTime, user.role));
     }
 
     public String logIn(User user) {

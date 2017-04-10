@@ -47,7 +47,7 @@ public class PacketHandler {
             if (obj instanceof Packet.ClientAdminCommand)
             {
                 if (user.getRole().greaterEqual(Role.ADMIN)) handleCommand(channel, user, (Packet.ClientAdminCommand) obj);
-                else server.send(channel, new Packet.ServerAlert("Insufficent rights!"));
+                else server.send(channel, new Packet.ServerAlert("Insufficent rights! Your role is: " + user.getRole().toString() + ", required role: ADMIN"));
             }
         }
     }

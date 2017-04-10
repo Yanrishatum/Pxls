@@ -147,13 +147,13 @@ public class App {
         else if (y2 >= height) y2 = height - 1;
         
         // Swap
-        if (x2 > x1)
+        if (x2 < x1)
         {
             int tmp = x2;
             x2 = x1;
             x1 = tmp;
         }
-        if (y2 > y1)
+        if (y2 < y1)
         {
             int tmp = y2;
             y2 = y1;

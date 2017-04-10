@@ -30,7 +30,8 @@ public interface DAO extends Closeable {
             "username VARCHAR(32) NOT NULL," +
             "login VARCHAR(64) NOT NULL," +
             "signup_time TIMESTAMP NOT NULL DEFAULT now(6)," +
-            "last_pixel_time TIMESTAMP)")
+            "last_pixel_time TIMESTAMP," +
+            "role NOT NULL DEFAULT 0)")
     void createUsersTable();
 
     @SqlUpdate("UPDATE users SET last_pixel_time = now(6) WHERE id = :id")

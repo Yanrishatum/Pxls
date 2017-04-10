@@ -131,6 +131,8 @@ public class App {
 
     public static void blank(User user, int x1, int y1, int x2, int y2, int to, int from)
     {
+        saveMapBackup();
+        saveMapForce();
         // Would use optimization
         
         if (to < 0 || to >= getPalette().size() || from >= getPalette().size()) return;
@@ -163,19 +165,25 @@ public class App {
         int pos;
         int x;
         int y = y1;
+        byte bto = (byte) to;
+        int who = user.getId();
         while (y <= y2)
         {
             pos = y * width + x1;
             x = x1;
             while (x <= x2)
             {
-                if (from == -1 || board[pos + x] == (byte) from) board[pos + x] = (byte) to;
+                if (from == -1 || board[pos + x] == (byte) from)
+                {
+                    board[pos + x] = bto;
+                    database.blankStep(who, x, y, bto);
+                }
                 x++;
             }
-            y1++;
+            y++;
         }
         pixelLogger.log(Level.INFO, user.getName() + " Blank operation: " + x1 + " " + y1 + " > " + x2 + " " + y2 + " : " + (from == -1 ? to : from + " => " + to));
-        database.blank(user, x1, y1, x2, y2, to);
+        database.blankFinish(who);
     }
     public static void putPixel(int x, int y, int color, User user) {
         if (x < 0 || x >= width || y < 0 || y >= height || color < 0 || color >= getPalette().size()) return;

@@ -406,6 +406,9 @@ window.App = {
 
             window.URL.revokeObjectURL(blob);
         });
+    },
+    enableAdminPanel: function() {
+        $("<script></script>", { src:"/admin/admin.js" }).appendTo(document.body);
     }
 };
 

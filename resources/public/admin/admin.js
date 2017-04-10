@@ -25,3 +25,14 @@ var cooldownOverride = $("<input/>", {type: 'checkbox', id: 'admin-co'}).appendT
     App.socket.send(JSON.stringify({type: "admin_cdoverride", override: state}));
 });
 $("<label/>", {for: 'admin-co', text: "Override cooldown"}).appendTo(adminPanel);
+
+var commandInput = $("<input/>", { id: "admin-command" }).appendTo(adminPanel).keyup(function(e) {
+    if (e.which == 13)
+    {
+        var args = commandInput.val().split(" ");
+        var cmdName = args.shift();
+        App.socket.send(JSON.stringify({type: "command", command: cmdName, arguments: args} ));
+        commandInput.val("");
+        return false;
+    }
+});

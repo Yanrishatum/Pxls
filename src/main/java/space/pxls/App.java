@@ -56,7 +56,7 @@ public class App {
             while (min >= 0)
             {
                 newBoard[min] = board[min];
-                min++;
+                min--;
             }
         }
         

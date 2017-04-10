@@ -167,6 +167,21 @@ public class PacketHandler {
                 {
                     server.send(channel, new Packet.ServerAlert("User have not been found"));  
                 }
+                break;
+            case "toggleCooldown":
+                User userTarget = user;
+                if (cmd.arguments.length > 0 && cmd.arguments[0] != "")
+                {
+                    dbUsr = App.getDatabase().getUserByName(cmd.arguments[0]);
+                    if (dbUsr != null) userTarget = App.getUserManager().getByDB(dbUsr);
+                    if (userTarget == null)
+                    {
+                        server.send(channel, new Packet.ServerAlert("User not found!"));
+                        return;
+                    }
+                }
+                userTarget.setOverrideCooldown(!user.isOverridingCooldown());
+                break;
             default:
                 server.send(channel, new Packet.ServerAlert("Unknown command!"));
         }

@@ -29,6 +29,7 @@ public class User {
 
     public boolean canPlace() {
         if (role.greaterEqual(Role.MODERATOR) && overrideCooldown) return true;
+        if (role.equals(Role.BANNED)) return false;
 
         int serverCooldown = (int) App.getConfig().getDuration("cooldown", TimeUnit.SECONDS);
         return lastPlaceTime + serverCooldown * 1000 < System.currentTimeMillis();

@@ -10,6 +10,7 @@ import space.pxls.App;
 import space.pxls.user.Role;
 import space.pxls.user.User;
 import space.pxls.util.Timer;
+import space.pxls.data.DBUser;
 
 import org.apache.logging.log4j.Level;
 
@@ -55,6 +56,11 @@ public class PacketHandler {
     private void handlePlace(WebSocketChannel channel, User user, Packet.ClientPlace cp) {
         if (cp.x < 0 || cp.x >= App.getWidth() || cp.y < 0 || cp.y >= App.getHeight()) return;
         if (cp.color < 0 || cp.color >= App.getConfig().getStringList("board.palette").size()) return;
+        if (user.getRole().equals(Role.BANNED))
+        {
+            server.send(channel, new Packet.ServerAlert("Whoops, looks like you were a bad boy and was banned!"));
+            return;
+        }
         if (user.canPlace()) {
             if (user.updateCaptchaFlagPrePlace()) {
                 server.send(channel, new Packet.ServerCaptchaRequired());
@@ -145,6 +151,22 @@ public class PacketHandler {
                 App.pixelLogger.log(Level.INFO, user.getName() + " invoked map save.");
                 break;
             // TODO: Edit palette.
+            case "ban": case "unban":
+                Role target = cmd.command == "ban" ? Role.BANNED : Role.DEFAULT;
+                DBUser dbUsr = App.getDatabase().getUserByName(cmd.arguments[0]);
+                User usr = null;
+                if (dbUsr != null) usr = App.getUserManager().getByDB(dbUsr);
+                if (usr != null)
+                {
+                    usr.setRole(target);
+                    App.getDatabase().getHandle().updateUserRole(usr.getId(), target.toString());
+                    App.pixelLogger.log(Level.INFO, user.getName() + " set role " + target.toString() + " to user " + usr.getName());
+                    server.send(channel, new Packet.ServerAlert("User role set to : " + target.toString()));
+                }
+                else
+                {
+                    server.send(channel, new Packet.ServerAlert("User have not been found"));  
+                }
             default:
                 server.send(channel, new Packet.ServerAlert("Unknown command!"));
         }

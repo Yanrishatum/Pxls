@@ -23,6 +23,10 @@ public class Database implements Closeable {
         handle.createPixelsTable();
         handle.createUsersTable();
     }
+    
+    public DAO getHandle() {
+        return handle;
+    }
 
     public void blankStep(int who, int x, int y, byte color) {
         handle.putPixel(x, y, color, who);

@@ -36,7 +36,7 @@ public class UserManager {
         return getByDB(App.getDatabase().getUserByLogin(login));
     }
 
-    private User getByDB(DBUser user) {
+    public User getByDB(DBUser user) {
         if (user == null) return null;
         return userCache.computeIfAbsent(user.id, (k) -> new User(user.id, user.username, user.login, user.lastPlaceTime, user.role));
     }

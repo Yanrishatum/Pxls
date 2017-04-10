@@ -38,7 +38,7 @@ public interface DAO extends Closeable {
     void updateUserTime(@Bind("id") int userId);
     
     @SqlUpdate("UPDATE users SET role = :role WHERE id = :id")
-    void updateUserRole(@Bind("id") int userId, @Bind("role") int role);
+    void updateUserRole(@Bind("id") int userId, @Bind("role") String role);
 
     @SqlUpdate("CREATE TABLE IF NOT EXISTS ips (id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT, user INT REFERENCES users(user)), ip TEXT, last_activity NUMERIC DEFAULT now(6)")
     void createIpsTable();

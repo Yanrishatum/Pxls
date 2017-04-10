@@ -46,8 +46,19 @@ public class App {
 
         width = config.getInt("board.width");
         height = config.getInt("board.height");
-        board = new byte[width * height];
-
+        if (board == null) board = new byte[width * height];
+        else if (board.length != width * height)
+        {
+            // TODO: Save should contain current board size for adequate relocation of data.
+            byte[] newBoard = new byte[width * height];
+            int min = newBoard.length < board.length ? newBoard.length : board.length;
+            while (min >= 0)
+            {
+                newBoard[min] = board[min];
+                min++;
+            }
+        }
+        
         database = new Database();
         userManager = new UserManager();
 
@@ -110,7 +121,9 @@ public class App {
 
     private static void loadMap() {
         try {
-            board = Files.readAllBytes(getStorageDir().resolve("board.dat"));
+            Path boardPath = getStorageDir().resolve("board.dat");
+            if (Files.exists(boardPath))
+                board = Files.readAllBytes(boardPath);
         } catch (IOException e) {
             e.printStackTrace();
         }
